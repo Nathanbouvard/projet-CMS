@@ -1,0 +1,147 @@
+<?php
+
+namespace App\Entity;
+
+use App\Repository\BlockRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
+
+#[ORM\Entity(repositoryClass: BlockRepository::class)]
+#[ApiResource]
+class Block
+{
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 50)]
+    private ?string $type = null; 
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $content = null;
+
+    #[ORM\Column]
+    private ?int $position = null;
+
+    #[ORM\ManyToOne(inversedBy: 'blocks')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Article $article = null;
+
+    #[ORM\ManyToOne]
+    private ?Media $media = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?array $vizConfig = null;
+
+    #[ORM\OneToMany(mappedBy: 'block', targetEntity: Rating::class, cascade: ['remove'])]
+    private Collection $ratings;
+
+    public function __construct()
+    {
+        $this->ratings = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
+        return $this;
+    }
+
+    public function getContent(): ?string
+    {
+        return $this->content;
+    }
+
+    public function setContent(?string $content): static
+    {
+        $this->content = $content;
+        return $this;
+    }
+
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(int $position): static
+    {
+        $this->position = $position;
+        return $this;
+    }
+
+    public function getArticle(): ?Article
+    {
+        return $this->article;
+    }
+
+    public function setArticle(?Article $article): static
+    {
+        $this->article = $article;
+        return $this;
+    }
+
+    public function getMedia(): ?Media
+    {
+        return $this->media;
+    }
+
+    public function setMedia(?Media $media): static
+    {
+        $this->media = $media;
+        return $this;
+    }
+
+    public function getVizConfig(): ?array
+    {
+        return $this->vizConfig;
+    }
+
+    public function setVizConfig(?array $vizConfig): static
+    {
+        $this->vizConfig = $vizConfig;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Rating>
+     */
+    public function getRatings(): Collection
+    {
+        return $this->ratings;
+    }
+
+    public function addRating(Rating $rating): static
+    {
+        if (!$this->ratings->contains($rating)) {
+            $this->ratings->add($rating);
+            $rating->setBlock($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRating(Rating $rating): static
+    {
+        if ($this->ratings->removeElement($rating)) {
+            if ($rating->getBlock() === $this) {
+                $rating->setBlock(null);
+            }
+        }
+
+        return $this;
+    }
+}

@@ -1,0 +1,111 @@
+{% extends '@EasyAdmin/crud/field/generic.html.twig' %}
+
+{% block content %}
+    <div class="viz-config-wrapper mt-3">
+        {% if field.value is null or field.value == {} %}
+            <div class="alert alert-info">
+                <small>Aucune configuration de graphique pour le moment</small>
+            </div>
+        {% else %}
+            <div class="card">
+                <div class="card-body">
+                    <dl class="row small">
+                        {% if field.value.dataset_id %}
+                            <dt class="col-sm-4">Dataset</dt>
+                            <dd class="col-sm-8">{{ field.value.dataset_id }}</dd>
+                        {% endif %}
+                        {% if field.value.type %}
+                            <dt class="col-sm-4">Type</dt>
+                            <dd class="col-sm-8">{{ field.value.type }}</dd>
+                        {% endif %}
+                        {% if field.value.axe_x %}
+                            <dt class="col-sm-4">Axe X</dt>
+                            <dd class="col-sm-8">{{ field.value.axe_x }}</dd>
+                        {% endif %}
+                        {% if field.value.axe_y %}
+                            <dt class="col-sm-4">Axe Y</dt>
+                            <dd class="col-sm-8">{{ field.value.axe_y }}</dd>
+                        {% endif %}
+                        {% if field.value.couleur %}
+                            <dt class="col-sm-4">Couleur</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge" style="background-color: {{ field.value.couleur }}; display: inline-block; min-width: 40px; text-align: center;">{{ field.value.couleur }}</span>
+                            </dd>
+                        {% endif %}
+                        {% if field.value.titre %}
+                            <dt class="col-sm-4">Titre</dt>
+                            <dd class="col-sm-8">{{ field.value.titre }}</dd>
+                        {% endif %}
+                    </dl>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block form_widget %}
+    <div class="viz-config-form-wrapper mt-3">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Configuration du Graphique</h6>
+            </div>
+            <div class="card-body">
+                <div class="form-group mb-3">
+                    <label class="form-label">Type de graphique</label>
+                    <select name="{{ field.name }}[type]" class="form-control">
+                        <option value="">-- Sélectionnez un type --</option>
+                        <option value="bar" {% if field.value.type == 'bar' %}selected{% endif %}>Barres</option>
+                        <option value="line" {% if field.value.type == 'line' %}selected{% endif %}>Ligne</option>
+                        <option value="pie" {% if field.value.type == 'pie' %}selected{% endif %}>Pie/Donut</option>
+                        <option value="scatter" {% if field.value.type == 'scatter' %}selected{% endif %}>Scatter</option>
+                    </select>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Dataset ID</label>
+                            <input type="number" name="{{ field.name }}[dataset_id]" class="form-control" 
+                                   value="{{ field.value.dataset_id }}" placeholder="ID du dataset">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Couleur</label>
+                            <input type="color" name="{{ field.name }}[couleur]" class="form-control form-control-color" 
+                                   value="{{ field.value.couleur }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Colonne Axe X</label>
+                            <input type="text" name="{{ field.name }}[axe_x]" class="form-control" 
+                                   value="{{ field.value.axe_x }}" placeholder="Ex: mois, date">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Colonne Axe Y</label>
+                            <input type="text" name="{{ field.name }}[axe_y]" class="form-control" 
+                                   value="{{ field.value.axe_y }}" placeholder="Ex: ventes, prix">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Titre (optionnel)</label>
+                    <input type="text" name="{{ field.name }}[titre]" class="form-control" 
+                           value="{{ field.value.titre }}" placeholder="Titre du graphique">
+                </div>
+
+                <div class="alert alert-info alert-sm mt-3 mb-0">
+                    <small><strong>Astuce:</strong> Dataset ID doit correspondre à l'ID d'un dataset existant</small>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

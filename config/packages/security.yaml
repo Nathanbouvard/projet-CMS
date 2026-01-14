@@ -1,0 +1,82 @@
+security:
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    providers:
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        
+        login:
+            pattern: ^/api/login
+            stateless: true
+            json_login:
+                check_path: /api/login_check
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        api:
+            pattern:   ^/api
+            stateless: true
+            jwt: ~
+
+        main:
+            lazy: true
+            provider: app_user_provider
+            
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true
+                # Redirection automatique vers l'admin après connexion
+                default_target_path: admin
+
+            logout:
+                path: app_logout
+                # Redirection vers la page de login après déconnexion
+                target: app_login
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#the-firewall
+
+    # Définition de la hiérarchie des rôles (Qui hérite de qui ?)
+    role_hierarchy:
+        ROLE_SUBSCRIBER:  ROLE_USER       # L'abonné est un utilisateur de base
+        ROLE_AUTHOR:      ROLE_USER       # L'auteur est aussi un utilisateur
+        ROLE_EDITOR:      ROLE_AUTHOR     # L'éditeur a tous les droits de l'auteur + les siens
+        ROLE_DESIGNER:    ROLE_USER
+        ROLE_PROVIDER:    ROLE_USER
+        
+        # L'admin possède tous les droits cumulés
+        ROLE_ADMIN:       [ROLE_EDITOR, ROLE_DESIGNER, ROLE_PROVIDER, ROLE_SUBSCRIBER]
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/docs, roles: PUBLIC_ACCESS }
+        - { path: ^/api/contexts, roles: PUBLIC_ACCESS }
+        - { path: ^/api/schema, roles: PUBLIC_ACCESS }
+        - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
+
+        # On autorise l'accès à la page d'inscription
+        - { path: ^/register, roles: PUBLIC_ACCESS }
+        
+        # On autorise l'accès à la page de login
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+        
+        # On autorise l'accès à /admin à partir du rôle USER.
+        # (On filtrera ensuite les menus dans EasyAdmin pour que l'Abonné ne voie rien)
+        - { path: ^/admin, roles: ROLE_USER }
+        
+        # La page de profil pour les abonnés
+        - { path: ^/profile, roles: ROLE_SUBSCRIBER }

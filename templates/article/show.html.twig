@@ -1,0 +1,179 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block body %}
+    {# --- 1. GESTION DU THÈME GRAPHIQUE --- #}
+    {% set theme = article.theme %}
+    <style>
+        :root {
+            /* Couleurs dynamiques basées sur le thème */
+            --theme-primary: {{ theme ? theme.primaryColor : '#0d6efd' }};
+            --theme-bg: {{ theme ? theme.backgroundColor : '#ffffff' }};
+            --theme-font: {{ theme ? theme.fontFamily|raw : 'system-ui' }};
+        }
+        
+        body {
+            background-color: var(--theme-bg);
+            font-family: var(--theme-font);
+        }
+        
+        /* On force les titres et les éléments "primary" à prendre la couleur du thème */
+        h1, h2, h3, h4, .text-theme {
+            color: var(--theme-primary);
+        }
+
+        /* On force le bouton du formulaire PHP à prendre la couleur du thème */
+        .btn-primary {
+            background-color: var(--theme-primary) !important;
+            border-color: var(--theme-primary) !important;
+        }
+
+        .border-theme {
+            border-color: var(--theme-primary) !important;
+        }
+    </style>
+
+    <div class="container py-5">
+        
+        {# --- EN-TÊTE --- #}
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-4 fw-bold mb-3">{{ article.title }}</h1>
+                <div class="text-muted mb-4">
+                    Par <strong>{{ article.author.pseudo }}</strong> 
+                    le {{ article.createdAt|date('d/m/Y') }}
+                </div>
+
+                {% if article.summary %}
+                    <div class="p-4 rounded bg-light border-start border-4 border-theme text-start shadow-sm">
+                        <p class="lead fst-italic mb-0 text-dark">{{ article.summary }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {# --- CONTENU (BLOCS) --- #}
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                {% for block in article.blocks %}
+                    <div class="mb-5">
+                        {% if block.type == 'text' %}
+                            <div class="fs-5 lh-lg text-dark">{{ block.content|nl2br }}</div>
+
+                        {% elseif block.type == 'title' %}
+                            <h2 class="fw-bold mt-4 mb-3 border-bottom border-theme pb-2">{{ block.content }}</h2>
+
+                        {% elseif block.type == 'image' and block.media %}
+                            <div class="text-center my-4">
+                                <img src="{{ asset('uploads/media/' ~ block.media.filename) }}" 
+                                     class="img-fluid rounded shadow" 
+                                     alt="{{ block.media.altText }}">
+                            </div>
+
+                        {% elseif block.type == 'viz' %}
+                            <div class="card shadow border-theme" style="border-top-width: 5px;">
+                                <div class="card-body">
+                                    <h5 class="text-center mb-3 text-dark">{{ block.vizConfig.titre|default('Données') }}</h5>
+                                    <div style="height: 350px;">
+                                        <canvas id="chart-{{ block.id }}" class="data-viz-canvas"
+                                                data-config="{{ block.vizConfig|json_encode|e('html_attr') }}">
+                                        </canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# --- ZONE AVIS + FORMULAIRE --- #}
+        <div class="row justify-content-center mt-5">
+            <div class="col-lg-8">
+                <hr class="my-5">
+                <h3 class="mb-4 fw-bold">📢 Avis des lecteurs</h3>
+
+                {# FORMULAIRE D'AVIS #}
+                <div class="card shadow-sm mb-5 bg-white border-0">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3 text-dark">Laisser une note</h5>
+                        
+                        {# On ouvre le formulaire #}
+                        {{ form_start(reviewForm) }}
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form_row(reviewForm.pseudo) }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form_row(reviewForm.rating) }}
+                                </div>
+                            </div>
+                            {{ form_row(reviewForm.message) }}
+                            
+                            {# C'EST ICI QU'ON A CORRIGÉ : On utilise le bouton du PHP #}
+                            <div class="mt-3">
+                                {{ form_row(reviewForm.submit) }}
+                            </div>
+
+                        {# On ferme le formulaire (plus de bouton caché qui s'ajoute) #}
+                        {{ form_end(reviewForm) }}
+                    </div>
+                </div>
+
+                {# LISTE DES AVIS #}
+                <div class="reviews-list">
+                    {% for rating in article.ratings %}
+                        <div class="card mb-3 border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <strong class="text-theme">{{ rating.pseudo }}</strong>
+                                    <small class="text-muted">{{ rating.createdAt|date('d/m/Y') }}</small>
+                                </div>
+                                <div class="text-warning mb-2">
+                                    {% for i in 1..5 %}{% if i <= rating.rating %}★{% else %}☆{% endif %}{% endfor %}
+                                </div>
+                                <p class="card-text text-dark">{{ rating.message }}</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-light text-center border">Soyez le premier à donner votre avis !</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {# SCRIPTS JS #}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvases = document.querySelectorAll('.data-viz-canvas');
+            canvases.forEach(canvas => {
+                let config;
+                try { config = JSON.parse(canvas.dataset.config); } catch (e) { return; }
+                if (!config || !config.dataset_id) return;
+                fetch(`/api/dataset/${config.dataset_id}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const labels = data.map(row => row[config.axe_x]);
+                        const values = data.map(row => row[config.axe_y]);
+                        new Chart(canvas, {
+                            type: config.type,
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: config.titre || config.axe_y,
+                                    data: values,
+                                    backgroundColor: config.couleur || '#36a2eb',
+                                    borderColor: config.couleur || '#36a2eb',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: { responsive: true, maintainAspectRatio: false }
+                        });
+                    });
+            });
+        });
+    </script>
+{% endblock %}

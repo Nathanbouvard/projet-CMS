@@ -1,0 +1,108 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}Aperçu : {{ entity.instance.title }}{% endblock %}
+
+{% block main %}
+    {# Récupération des variables #}
+    {% set article = entity.instance %}
+    {% set theme = article.theme %}
+
+    <div class="article-preview p-4 rounded shadow-sm">
+        
+        {# STYLE SPÉCIFIQUE À L'ADMIN (Pour avoir les couleurs) #}
+        <style>
+            .article-preview {
+                --theme-primary: {{ theme ? theme.primaryColor : '#0d6efd' }};
+                --theme-bg: {{ theme ? theme.backgroundColor : '#ffffff' }};
+                --theme-font: {{ theme ? theme.fontFamily|raw : 'system-ui' }};
+                
+                background-color: var(--theme-bg);
+                font-family: var(--theme-font);
+                color: #333;
+            }
+            .article-preview h1, .article-preview h2 { color: var(--theme-primary); }
+            .preview-viz { border-top: 4px solid var(--theme-primary); }
+        </style>
+
+        {# HEADER #}
+        <div class="text-center mb-5">
+            <h1 class="fw-bold">{{ article.title }}</h1>
+            <p class="text-muted">Auteur : {{ article.author.pseudo }} | Thème : {{ theme ? theme.name : 'Aucun' }}</p>
+        </div>
+
+        {# CONTENU #}
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                {% for block in article.blocks %}
+                    <div class="mb-4">
+                        {% if block.type == 'text' %}
+                            <div>{{ block.content|nl2br }}</div>
+                        {% elseif block.type == 'title' %}
+                            <h2 class="mt-4 border-bottom pb-2" style="border-color: var(--theme-primary) !important;">{{ block.content }}</h2>
+                        {% elseif block.type == 'viz' %}
+                            <div class="card preview-viz shadow-sm p-3">
+                                <h5 class="text-center">{{ block.vizConfig.titre|default('Graphique') }}</h5>
+                                <div style="height:300px;"><canvas id="chart-{{ block.id }}" class="data-viz-canvas" data-config="{{ block.vizConfig|json_encode|e('html_attr') }}"></canvas></div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# LISTE DES AVIS (Lecture seule pour l'admin) #}
+        <div class="mt-5 pt-4 border-top">
+            <h3>Avis des lecteurs ({{ article.ratings|length }})</h3>
+            <div class="row">
+                {% for rating in article.ratings %}
+                    <div class="col-md-4 mb-2">
+                        <div class="card p-2 bg-light">
+                            <strong>{{ rating.pseudo }} ({{ rating.rating }}/5)</strong>
+                            <p class="small mb-0">{{ rating.message }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# BOUTONS D'ACTION #}
+        <div class="text-center mt-5">
+            <a href="{{ ea_url().setAction('index') }}" class="btn btn-secondary">Retour liste</a>
+            <a href="{{ ea_url().setAction('edit').setEntityId(article.id) }}" class="btn btn-primary">✏️ Modifier cet article</a>
+        </div>
+    </div>
+
+    {# Scripts JS (Nécessaire aussi ici pour voir les graphes) #}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // ... (Copie le même script JS que dans le fichier précédent ici) ...
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvases = document.querySelectorAll('.data-viz-canvas');
+            canvases.forEach(canvas => {
+                let config;
+                try { config = JSON.parse(canvas.dataset.config); } catch (e) { return; }
+                if (!config || !config.dataset_id) return;
+                fetch(`/api/dataset/${config.dataset_id}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const labels = data.map(row => row[config.axe_x]);
+                        const values = data.map(row => row[config.axe_y]);
+                        new Chart(canvas, {
+                            type: config.type,
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: config.titre || config.axe_y,
+                                    data: values,
+                                    backgroundColor: config.couleur || '#36a2eb',
+                                    borderColor: config.couleur || '#36a2eb',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: { responsive: true, maintainAspectRatio: false }
+                        });
+                    });
+            });
+        });
+    </script>
+{% endblock %}
