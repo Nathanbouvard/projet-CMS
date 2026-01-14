@@ -73,6 +73,7 @@ security:
         
         # On autorise l'accès à la page de login
         - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/connect-admin, roles: PUBLIC_ACCESS }
         
         # On autorise l'accès à /admin à partir du rôle USER.
         # (On filtrera ensuite les menus dans EasyAdmin pour que l'Abonné ne voie rien)
