@@ -69,6 +69,6 @@ class DashboardController extends AbstractDashboardController
             ->setPermission('ROLE_ADMIN');
 
         yield MenuItem::section();
-        yield MenuItem::linkToUrl('Retour au site', 'fas fa-arrow-left', '/');
+        yield MenuItem::linkToUrl('Retour au site', 'fas fa-arrow-left', 'http://localhost:3000/');
     }
 }
