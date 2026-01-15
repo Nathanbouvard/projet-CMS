@@ -8,33 +8,44 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BlockRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: ['groups' => ['block:read']],
+    denormalizationContext: ['groups' => ['block:write']]
+)]
 class Block
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['article:read', 'block:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['article:read', 'block:read', 'block:write'])]
     private ?string $type = null; 
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['article:read', 'block:read', 'block:write'])]
     private ?string $content = null;
 
     #[ORM\Column]
+    #[Groups(['article:read', 'block:read', 'block:write'])]
     private ?int $position = null;
 
     #[ORM\ManyToOne(inversedBy: 'blocks')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['block:read', 'block:write'])]
     private ?Article $article = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['article:read', 'block:read', 'block:write'])]
     private ?Media $media = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['article:read', 'block:read', 'block:write'])]
     private ?array $vizConfig = null;
 
     #[ORM\OneToMany(mappedBy: 'block', targetEntity: Rating::class, cascade: ['remove'])]

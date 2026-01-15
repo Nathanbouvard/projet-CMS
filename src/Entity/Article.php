@@ -7,53 +7,72 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Rating; // <--- Import Important
+use App\Entity\Rating;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new Get(normalizationContext: ['groups' => ['article:read']]),
+        new GetCollection(normalizationContext: ['groups' => ['article:list']])
+    ],
+    normalizationContext: ['groups' => ['article:read']],
+    denormalizationContext: ['groups' => ['article:write']]
+)]
 class Article
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['article:list', 'article:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['article:list', 'article:read', 'article:write'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['article:read'])]
     private ?string $slug = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['article:list', 'article:read', 'article:write'])]
     private ?string $summary = null;
 
     #[ORM\Column]
+    #[Groups(['article:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['article:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'articles')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['article:read'])]
     private ?User $author = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['article:read', 'article:write'])]
     private ?Theme $theme = null;
 
     #[ORM\OneToMany(mappedBy: 'article', targetEntity: Block::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['position' => 'ASC'])]
+    #[Groups(['article:read'])]
     private Collection $blocks;
 
-    // --- AJOUT POUR LES AVIS ---
     #[ORM\OneToMany(mappedBy: 'article', targetEntity: Rating::class, orphanRemoval: true)]
+    #[Groups(['article:read'])]
     private Collection $ratings;
 
     public function __construct()
     {
         $this->blocks = new ArrayCollection();
-        $this->ratings = new ArrayCollection(); // <--- Initialisation obligatoire
+        $this->ratings = new ArrayCollection();
     }
 
     #[ORM\PrePersist]
@@ -111,6 +130,7 @@ class Article
     public function removeBlock(Block $block): static
     {
         if ($this->blocks->removeElement($block)) {
+            // set the owning side to null (unless already changed)
             if ($block->getArticle() === $this) {
                 $block->setArticle(null);
             }

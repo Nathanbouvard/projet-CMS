@@ -44,6 +44,13 @@
                                 <h5 class="text-center">{{ block.vizConfig.titre|default('Graphique') }}</h5>
                                 <div style="height:300px;"><canvas id="chart-{{ block.id }}" class="data-viz-canvas" data-config="{{ block.vizConfig|json_encode|e('html_attr') }}"></canvas></div>
                             </div>
+                        {% elseif block.type == 'image' and block.media %}
+                            <div class="text-center my-4">
+                                <img src="{{ asset('uploads/media/' ~ block.media.filename) }}" 
+                                     class="img-fluid rounded shadow" 
+                                     style="max-height: 400px;"
+                                     alt="{{ block.media.altText|default('Image de l\'article') }}">
+                            </div>
                         {% endif %}
                     </div>
                 {% endfor %}
