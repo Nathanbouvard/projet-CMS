@@ -39,6 +39,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $avatar = null;
 
+    private ?string $plainPassword = null;
+
     /**
      * @var Collection<int, Dataset>
      */
@@ -58,6 +60,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->articles = new ArrayCollection();
         $this->datasets = new ArrayCollection();
+        $this->roles = ['ROLE_USER'];
     }
 
     public function getId(): ?int
@@ -110,6 +113,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
+        $this->plainPassword = null;
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(?string $plainPassword): static
+    {
+        $this->plainPassword = $plainPassword;
+        return $this;
     }
 
     public function getPseudo(): ?string
