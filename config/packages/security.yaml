@@ -66,6 +66,7 @@ security:
         - { path: ^/api/docs, roles: PUBLIC_ACCESS }
         - { path: ^/api/contexts, roles: PUBLIC_ACCESS }
         - { path: ^/api/schema, roles: PUBLIC_ACCESS }
+        - { path: ^/api/articles, roles: PUBLIC_ACCESS }
         - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
 
         # On autorise l'accès à la page d'inscription
