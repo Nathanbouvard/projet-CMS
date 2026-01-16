@@ -57,20 +57,7 @@
             </div>
         </div>
 
-        {# LISTE DES AVIS (Lecture seule pour l'admin) #}
-        <div class="mt-5 pt-4 border-top">
-            <h3>Avis des lecteurs ({{ article.ratings|length }})</h3>
-            <div class="row">
-                {% for rating in article.ratings %}
-                    <div class="col-md-4 mb-2">
-                        <div class="card p-2 bg-light">
-                            <strong>{{ rating.pseudo }} ({{ rating.rating }}/5)</strong>
-                            <p class="small mb-0">{{ rating.message }}</p>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
+
 
         {# BOUTONS D'ACTION #}
         <div class="text-center mt-5">

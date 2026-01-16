@@ -7,7 +7,7 @@ use App\Entity\Block;
 use App\Entity\DataColumn;
 use App\Entity\Dataset;
 use App\Entity\Media;
-use App\Entity\Rating; 
+use App\Entity\Rating;
 use App\Entity\Theme;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -64,10 +64,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-users-cog', User::class)
             ->setPermission('ROLE_ADMIN');
             
-        yield MenuItem::linkToCrud('Notes & Avis', 'fas fa-star', Rating::class)
-            ->setController(RatingCrudController::class)
-            ->setPermission('ROLE_ADMIN');
-
         yield MenuItem::section();
         yield MenuItem::linkToUrl('Retour au site', 'fas fa-arrow-left', 'http://localhost:3000/');
     }
