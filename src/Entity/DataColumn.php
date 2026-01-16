@@ -21,7 +21,7 @@ class DataColumn
 
     #[ORM\ManyToOne(inversedBy: 'dataColumns')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Dataset $dataset = null;
+    private ?Media $media = null;
 
     public function getId(): ?int
     {
@@ -50,14 +50,14 @@ class DataColumn
         return $this;
     }
 
-    public function getDataset(): ?Dataset
+    public function getMedia(): ?Media
     {
-        return $this->dataset;
+        return $this->media;
     }
 
-    public function setDataset(?Dataset $dataset): static
+    public function setMedia(?Media $media): static
     {
-        $this->dataset = $dataset;
+        $this->media = $media;
         return $this;
     }
 }

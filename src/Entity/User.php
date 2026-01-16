@@ -49,8 +49,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Article::class)]
     private Collection $articles;
 
-    #[ORM\OneToMany(mappedBy: 'provider', targetEntity: Dataset::class)]
-    private Collection $datasets;
+    #[ORM\OneToMany(mappedBy: 'provider', targetEntity: Media::class)]
+    private Collection $media;
 
     /**
      * @var Collection<int, Article>
@@ -59,7 +59,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->articles = new ArrayCollection();
-        $this->datasets = new ArrayCollection();
+        $this->media = new ArrayCollection();
         $this->roles = ['ROLE_USER'];
     }
 
@@ -178,27 +178,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Dataset>
+     * @return Collection<int, Media>
      */
-    public function getDatasets(): Collection
+    public function getMedia(): Collection
     {
-        return $this->datasets;
+        return $this->media;
     }
 
-    public function addDataset(Dataset $dataset): static
+    public function addMedia(Media $media): static
     {
-        if (!$this->datasets->contains($dataset)) {
-            $this->datasets->add($dataset);
-            $dataset->setProvider($this);
+        if (!$this->media->contains($media)) {
+            $this->media->add($media);
+            $media->setProvider($this);
         }
         return $this;
     }
 
-    public function removeDataset(Dataset $dataset): static
+    public function removeMedia(Media $media): static
     {
-        if ($this->datasets->removeElement($dataset)) {
-            if ($dataset->getProvider() === $this) {
-                $dataset->setProvider(null);
+        if ($this->media->removeElement($media)) {
+            if ($media->getProvider() === $this) {
+                $media->setProvider(null);
             }
         }
         return $this;

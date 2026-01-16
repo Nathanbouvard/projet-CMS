@@ -3,7 +3,7 @@
 namespace App\Service;
 
 use App\Entity\DataColumn;
-use App\Entity\Dataset;
+use App\Entity\Media;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Csv\Reader;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -15,9 +15,9 @@ class CsvAnalyzer
         #[Autowire('%kernel.project_dir%/public/uploads/csv')] private string $csvDirectory
     ) {}
 
-    public function analyze(Dataset $dataset): void
+    public function analyze(Media $media): void
     {
-        $filePath = $this->csvDirectory . '/' . $dataset->getFilename();
+        $filePath = $this->csvDirectory . '/' . $media->getFilename();
 
         if (!file_exists($filePath)) {
             return;
@@ -42,7 +42,7 @@ class CsvAnalyzer
             // Création de l'entité DataColumn
             $column = new DataColumn();
             $column->setName($columnName);
-            $column->setDataset($dataset);
+            $column->setMedia($media);
 
             // Détection du type (Numeric vs Categorical)
             // On regarde la valeur dans la première ligne correspondant à cette colonne
