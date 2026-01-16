@@ -35,6 +35,15 @@ class ThemeCrudController extends AbstractCrudController
                     'Ludique' => '"Comic Sans MS", "Comic Sans", cursive',
                 ])
                 ->renderAsNativeWidget(),
+            
+            ChoiceField::new('imageSize', 'Taille des images')
+                ->setChoices([
+                    'Petite' => 'small',
+                    'Moyenne' => 'medium',
+                    'Grande' => 'large',
+                ])
+                ->renderAsNativeWidget()
+                ->setHelp('Choisissez la taille d\'affichage des images dans les articles.'),
         ];
     }
 }
