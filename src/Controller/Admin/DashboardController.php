@@ -45,8 +45,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Blocs de contenu', 'fas fa-cubes', Block::class)
             ->setPermission('ROLE_ADMIN');
 
-        // --- DATA ---
-        yield MenuItem::section('Centre de Données')->setPermission('ROLE_PROVIDER');
+
 
         // --- DESIGN ---
         yield MenuItem::section('Apparence')->setPermission('ROLE_DESIGNER');
