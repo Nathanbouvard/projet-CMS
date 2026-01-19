@@ -2,14 +2,14 @@
 
 namespace App\Form\DTO;
 
-use App\Entity\Dataset;
+use App\Entity\Media;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class VizConfigDTO
 {
-    // On stocke l'objet Dataset directement pour que le formulaire soit content
-    #[Assert\NotNull(message: 'Le dataset est obligatoire')]
-    public ?Dataset $dataset = null;
+    // On stocke l'objet Media directement pour que le formulaire soit content
+    #[Assert\NotNull(message: 'Le média est obligatoire')]
+    public ?Media $media = null;
 
     #[Assert\NotBlank(message: 'Le type de graphique est obligatoire')]
     #[Assert\Choice(choices: ['bar', 'line', 'pie', 'scatter'], message: 'Type invalide')]
@@ -31,7 +31,7 @@ class VizConfigDTO
     public function toArray(): array
     {
         return [
-            'dataset_id' => $this->dataset?->getId(),
+            'media_id' => $this->media?->getId(),
             'type' => $this->type,
             'axe_x' => $this->axeX,
             'axe_y' => $this->axeY,

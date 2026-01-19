@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Dataset;
+use App\Entity\Media;
 use App\Form\DTO\VizConfigDTO;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -24,12 +24,17 @@ class VizConfigFormType extends AbstractType
     {
         $builder
             // Note: Le nom du champ doit correspondre à la propriété du DTO
-            ->add('dataset', EntityType::class, [
-                'label' => 'Dataset Source',
-                'class' => Dataset::class,
+            ->add('media', EntityType::class, [
+                'label' => 'Média Source',
+                'class' => Media::class,
                 'choice_label' => 'name',
-                'placeholder' => 'Choisir un dataset...',
+                'placeholder' => 'Choisir un média...',
                 'attr' => ['class' => 'form-control'],
+                'query_builder' => function ($repo) {
+                    return $repo->createQueryBuilder('m')
+                        ->where('m.mimeType = :mimeType')
+                        ->setParameter('mimeType', 'text/csv');
+                },
             ])
             ->add('type', ChoiceType::class, [
                 'label' => 'Type de graphique',
@@ -55,9 +60,9 @@ class VizConfigFormType extends AbstractType
                     return $dto;
                 }
                 
-                // On récupère le dataset via son ID
-                if (!empty($dataAsArray['dataset_id'])) {
-                    $dto->dataset = $this->em->getRepository(Dataset::class)->find($dataAsArray['dataset_id']);
+                // On récupère le média via son ID
+                if (!empty($dataAsArray['media_id'])) {
+                    $dto->media = $this->em->getRepository(Media::class)->find($dataAsArray['media_id']);
                 }
                 
                 $dto->type = $dataAsArray['type'] ?? null;

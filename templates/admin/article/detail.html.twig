@@ -22,6 +22,9 @@
             }
             .article-preview h1, .article-preview h2 { color: var(--theme-primary); }
             .preview-viz { border-top: 4px solid var(--theme-primary); }
+            .image-small { max-height: 200px; }
+            .image-medium { max-height: 400px; }
+            .image-large { max-height: 600px; }
         </style>
 
         {# HEADER #}
@@ -42,13 +45,12 @@
                         {% elseif block.type == 'viz' %}
                             <div class="card preview-viz shadow-sm p-3">
                                 <h5 class="text-center">{{ block.vizConfig.titre|default('Graphique') }}</h5>
-                                <div style="height:300px;"><canvas id="chart-{{ block.id }}" class="data-viz-canvas" data-config="{{ block.vizConfig|json_encode|e('html_attr') }}"></canvas></div>
+                                <div style="height:300px;"><canvas id="chart-{{ block.id }}" class="data-viz-canvas" data-config="{{ block.vizConfig|merge({media_id: block.media.id})|json_encode|e('html_attr') }}"></canvas></div>
                             </div>
                         {% elseif block.type == 'image' and block.media %}
                             <div class="text-center my-4">
                                 <img src="{{ asset('uploads/media/' ~ block.media.filename) }}" 
-                                     class="img-fluid rounded shadow" 
-                                     style="max-height: 400px;"
+                                     class="img-fluid rounded shadow image-{{ theme.imageSize|default('medium') }}" 
                                      alt="{{ block.media.altText|default('Image de l\'article') }}">
                             </div>
                         {% endif %}
@@ -75,8 +77,8 @@
             canvases.forEach(canvas => {
                 let config;
                 try { config = JSON.parse(canvas.dataset.config); } catch (e) { return; }
-                if (!config || !config.dataset_id) return;
-                fetch(`/api/dataset/${config.dataset_id}`)
+                if (!config || !config.media_id) return;
+                fetch(`/api/media/${config.media_id}/data`)
                     .then(res => res.json())
                     .then(data => {
                         const labels = data.map(row => row[config.axe_x]);

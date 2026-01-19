@@ -78,6 +78,12 @@ security:
         
         # On autorise l'accès à /admin à partir du rôle USER.
         # (On filtrera ensuite les menus dans EasyAdmin pour que l'Abonné ne voie rien)
+        - { path: ^/admin/user, roles: ROLE_ADMIN }
+        - { path: ^/admin/datacolumn, roles: ROLE_PROVIDER }
+        - { path: ^/admin/block, roles: ROLE_EDITOR }
+        - { path: ^/admin/article, roles: ROLE_AUTHOR }
+        - { path: ^/admin/theme, roles: ROLE_DESIGNER }
+        - { path: ^/admin/media, roles: ROLE_DESIGNER }
         - { path: ^/admin, roles: ROLE_USER }
         
         # La page de profil pour les abonnés
