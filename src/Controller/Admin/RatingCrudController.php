@@ -50,8 +50,6 @@ class RatingCrudController extends AbstractCrudController
                 ])
                 ->renderAsNativeWidget(),
 
-            TextareaField::new('message', 'Commentaire'),
-
             AssociationField::new('article', 'Sur l\'article'),
 
             DateTimeField::new('createdAt', 'Date')->hideOnForm(),

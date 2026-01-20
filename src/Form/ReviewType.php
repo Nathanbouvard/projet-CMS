@@ -31,10 +31,6 @@ class ReviewType extends AbstractType
                 ],
                 'attr' => ['class' => 'form-select']
             ])
-            ->add('message', TextareaType::class, [
-                'label' => 'Votre avis',
-                'attr' => ['class' => 'form-control', 'rows' => 4, 'placeholder' => 'Qu\'avez-vous pensé de cet article ?']
-            ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Envoyer mon avis',
                 'attr' => ['class' => 'btn btn-primary mt-3 w-100']
