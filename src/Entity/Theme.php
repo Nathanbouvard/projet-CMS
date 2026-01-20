@@ -36,6 +36,10 @@ class Theme
     #[Groups(['article:read'])]
     private ?string $textColor = null;
 
+    #[ORM\Column(length: 7, nullable: true)]
+    #[Groups(['article:read'])]
+    private ?string $chartColor = null;
+
     #[ORM\Column(length: 255)]
     #[Groups(['article:read'])]
     private ?string $fontFamily = null;
@@ -107,6 +111,17 @@ class Theme
     public function setTextColor(?string $textColor): static
     {
         $this->textColor = $textColor;
+        return $this;
+    }
+
+    public function getChartColor(): ?string
+    {
+        return $this->chartColor;
+    }
+
+    public function setChartColor(?string $chartColor): static
+    {
+        $this->chartColor = $chartColor;
         return $this;
     }
 

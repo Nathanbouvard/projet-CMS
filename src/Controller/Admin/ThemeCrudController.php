@@ -27,6 +27,9 @@ class ThemeCrudController extends AbstractCrudController
             ColorField::new('textColor', 'Couleur du texte')
                 ->setHelp('Couleur par défaut pour le texte des articles.'),
 
+            ColorField::new('chartColor', 'Couleur des graphiques')
+                ->setHelp('Couleur principale pour les barres et courbes des graphiques.'),
+
             ChoiceField::new('fontFamily', 'Typographie')
                 ->setChoices([
                     'Moderne (Sans-Serif)' => 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
