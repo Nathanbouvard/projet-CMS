@@ -8,10 +8,16 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BlockRepository::class)]
 #[ApiResource(
+    operations: [
+        new Get(normalizationContext: ['groups' => ['block:read']]),
+        new GetCollection(normalizationContext: ['groups' => ['block:read']])
+    ],
     normalizationContext: ['groups' => ['block:read']],
     denormalizationContext: ['groups' => ['block:write']]
 )]

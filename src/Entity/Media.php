@@ -7,11 +7,17 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ApiResource(
+    operations: [
+        new Get(normalizationContext: ['groups' => ['media:read']]),
+        new GetCollection(normalizationContext: ['groups' => ['media:read']])
+    ],
     normalizationContext: ['groups' => ['media:read']],
     denormalizationContext: ['groups' => ['media:write']]
 )]
