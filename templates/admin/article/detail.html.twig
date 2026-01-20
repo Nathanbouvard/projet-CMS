@@ -45,8 +45,7 @@
                         {% elseif block.type == 'viz' %}
                             <div class="card preview-viz shadow-sm p-3">
                                 <h5 class="text-center">{{ block.vizConfig.titre|default('Graphique') }}</h5>
-                                <div style="height:300px;"><canvas id="chart-{{ block.id }}" class="data-viz-canvas" data-config="{{ block.vizConfig|merge({media_id: block.media.id})|json_encode|e('html_attr') }}"></canvas></div>
-                            </div>
+                                                                  <div style="height:300px;"><canvas id="chart-{{ block.id }}" class="data-viz-canvas" data-config="{{ block.vizConfig|merge({media_id: block.media ? block.media.id : null})|json_encode|e('html_attr') }}"></canvas></div>                            </div>
                         {% elseif block.type == 'image' and block.media %}
                             <div class="text-center my-4">
                                 <img src="{{ asset('uploads/media/' ~ block.media.filename) }}" 

@@ -17,6 +17,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 )]
 class Block
 {
+    public const BLOCK_TYPE_TEXT = 'text';
+    public const BLOCK_TYPE_TITLE = 'title';
+    public const BLOCK_TYPE_IMAGE = 'image';
+    public const BLOCK_TYPE_VIZ = 'viz';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -48,12 +53,8 @@ class Block
     #[Groups(['article:read', 'block:read', 'block:write'])]
     private ?array $vizConfig = null;
 
-    #[ORM\OneToMany(mappedBy: 'block', targetEntity: Rating::class, cascade: ['remove'])]
-    private Collection $ratings;
-
     public function __construct()
     {
-        $this->ratings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -127,32 +128,5 @@ class Block
         return $this;
     }
 
-    /**
-     * @return Collection<int, Rating>
-     */
-    public function getRatings(): Collection
-    {
-        return $this->ratings;
-    }
 
-    public function addRating(Rating $rating): static
-    {
-        if (!$this->ratings->contains($rating)) {
-            $this->ratings->add($rating);
-            $rating->setBlock($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRating(Rating $rating): static
-    {
-        if ($this->ratings->removeElement($rating)) {
-            if ($rating->getBlock() === $this) {
-                $rating->setBlock(null);
-            }
-        }
-
-        return $this;
-    }
 }

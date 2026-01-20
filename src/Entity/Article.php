@@ -147,6 +147,28 @@ class Article
         return $this->ratings;
     }
 
+    public function addRating(Rating $rating): static
+    {
+        if (!$this->ratings->contains($rating)) {
+            $this->ratings->add($rating);
+            $rating->setArticle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRating(Rating $rating): static
+    {
+        if ($this->ratings->removeElement($rating)) {
+            // set the owning side to null (unless already changed)
+            if ($rating->getArticle() === $this) {
+                $rating->setArticle(null);
+            }
+        }
+
+        return $this;
+    }
+
     public function __toString(): string
     {
         return $this->title;

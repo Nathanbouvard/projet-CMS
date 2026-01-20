@@ -3,7 +3,6 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Media;
-use App\Service\CsvAnalyzer;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
@@ -17,8 +16,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 class MediaCrudController extends AbstractCrudController
 {
     public function __construct(
-        private SluggerInterface $slugger,
-        private CsvAnalyzer $csvAnalyzer
+        private SluggerInterface $slugger
     ) {
     }
 
@@ -55,20 +53,12 @@ class MediaCrudController extends AbstractCrudController
     {
         $this->handleUpload($entityInstance);
         parent::persistEntity($entityManager, $entityInstance);
-
-        if ($entityInstance->getMimeType() === 'text/csv') {
-            $this->csvAnalyzer->analyze($entityInstance);
-        }
     }
 
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         $this->handleUpload($entityInstance);
         parent::updateEntity($entityManager, $entityInstance);
-
-        if ($entityInstance->getMimeType() === 'text/csv') {
-            $this->csvAnalyzer->analyze($entityInstance);
-        }
     }
 
     private function handleUpload($entityInstance): void

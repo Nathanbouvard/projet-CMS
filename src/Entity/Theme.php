@@ -37,6 +37,10 @@ class Theme
     #[Groups(['article:read'])]
     private ?string $imageSize = null;
 
+    #[ORM\Column(length: 20, nullable: true)]
+    #[Groups(['article:read'])]
+    private ?string $fontSize = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -53,6 +57,19 @@ class Theme
 
         return $this;
     }
+
+    public function getFontSize(): ?string
+    {
+        return $this->fontSize;
+    }
+
+    public function setFontSize(?string $fontSize): static
+    {
+        $this->fontSize = $fontSize;
+
+        return $this;
+    }
+
 
 
     public function getName(): ?string

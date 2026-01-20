@@ -44,6 +44,15 @@ class ThemeCrudController extends AbstractCrudController
                 ])
                 ->renderAsNativeWidget()
                 ->setHelp('Choisissez la taille d\'affichage des images dans les articles.'),
+
+            ChoiceField::new('fontSize', 'Taille de la police')
+                ->setChoices([
+                    'Petite' => 'small',
+                    'Moyenne' => 'medium',
+                    'Grande' => 'large',
+                ])
+                ->renderAsNativeWidget()
+                ->setHelp('Choisissez la taille de la police pour le contenu des articles.'),
         ];
     }
 }

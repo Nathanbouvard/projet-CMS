@@ -11,6 +11,7 @@
             --theme-primary: {{ theme ? theme.primaryColor : '#0d6efd' }};
             --theme-bg: {{ theme ? theme.backgroundColor : '#ffffff' }};
             --theme-font: {{ theme ? theme.fontFamily|raw : 'system-ui' }};
+            --theme-font-size: {% if theme and theme.fontSize == 'small' %}0.8em{% elseif theme and theme.fontSize == 'large' %}1.2em{% else %}1em{% endif %};
         }
         
         body {
@@ -21,6 +22,11 @@
         /* On force les titres et les éléments "primary" à prendre la couleur du thème */
         h1, h2, h3, h4, .text-theme {
             color: var(--theme-primary);
+        }
+
+        /* Appliquer la taille de police personnalisée au contenu de l'article */
+        .article-content {
+            font-size: var(--theme-font-size);
         }
 
         /* On force le bouton du formulaire PHP à prendre la couleur du thème */
