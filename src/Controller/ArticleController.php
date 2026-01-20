@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Article;
 use App\Entity\Rating;      
+use App\Repository\ArticleRepository;
 use App\Form\ReviewType;     
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,8 +19,11 @@ class ArticleController extends AbstractController
      * Affiche un article complet ET gère le formulaire d'avis
      */
     #[Route('/article/{slug}', name: 'app_article_show')]
-    public function show(?Article $article, Request $request, EntityManagerInterface $em): Response
+    public function show(string $slug, Request $request, EntityManagerInterface $em, ArticleRepository $articleRepository): Response
     {
+        // Fetch article eagerly loading the theme
+        $article = $articleRepository->findOneBySlugWithTheme($slug);
+
         // 1. Sécurité : si l'article n'existe pas, erreur 404
         if (!$article) {
             throw $this->createNotFoundException('Cet article n\'existe pas.');

@@ -73,16 +73,35 @@ class MediaCrudController extends AbstractCrudController
         if ($uploadedFile) {
             $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
             $safeFilename = $this->slugger->slug($originalFilename);
-            $newFilename = $safeFilename.'-'.uniqid().'.'.$uploadedFile->guessExtension();
+            
+            $originalClientExtension = strtolower($uploadedFile->getClientOriginalExtension() ?? '');
+            
+            // Determine the extension for saving
+            $saveExtension = $uploadedFile->guessExtension(); // Default to guessed
+            if ($originalClientExtension === 'csv') {
+                $saveExtension = 'csv'; // Force 'csv' if client uploaded as .csv
+            }
 
-            $mimeType = $uploadedFile->getMimeType();
-            $entityInstance->setMimeType($mimeType);
+            $newFilename = $safeFilename.'-'.uniqid().'.'.$saveExtension;
+
+            $originalMimeType = $uploadedFile->getMimeType();
+            $guessedExtension = strtolower($uploadedFile->guessExtension() ?? '');
+            $originalClientExtension = strtolower($uploadedFile->getClientOriginalExtension() ?? ''); // Get original extension
+
+            $finalMimeType = $originalMimeType; // Start with original
+
+            // Force mimeType to text/csv if the original client extension is csv, overriding any misdetection
+            if ($originalClientExtension === 'csv' && $finalMimeType !== 'text/csv') {
+                $finalMimeType = 'text/csv';
+            }
+
+            $entityInstance->setMimeType($finalMimeType); // Set the potentially forced MIME type
             
             $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/';
             
-            if (str_starts_with($mimeType, 'image/')) {
+            if (str_starts_with($finalMimeType, 'image/')) {
                 $uploadDir .= 'media';
-            } elseif ($mimeType === 'text/csv') {
+            } elseif ($finalMimeType === 'text/csv') {
                 $uploadDir .= 'csv';
             } else {
                 $uploadDir .= 'documents';

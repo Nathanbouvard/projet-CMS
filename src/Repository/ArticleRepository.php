@@ -16,6 +16,20 @@ class ArticleRepository extends ServiceEntityRepository
         parent::__construct($registry, Article::class);
     }
 
+    /**
+     * Finds an Article by its slug, eagerly loading the associated Theme.
+     */
+    public function findOneBySlugWithTheme(string $slug): ?Article
+    {
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.theme', 't') // Join the Theme entity
+            ->addSelect('t')          // Select the Theme entity as well
+            ->andWhere('a.slug = :slug')
+            ->setParameter('slug', $slug)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     //    /**
     //     * @return Article[] Returns an array of Article objects
     //     */

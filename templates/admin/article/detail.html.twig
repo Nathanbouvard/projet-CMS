@@ -12,16 +12,16 @@
         {# STYLE SPÉCIFIQUE À L'ADMIN (Pour avoir les couleurs) #}
         <style>
             .article-preview {
-                --theme-primary: {{ theme ? theme.primaryColor : '#0d6efd' }};
-                --theme-bg: {{ theme ? theme.backgroundColor : '#ffffff' }};
+                --theme-title-color: {{ theme ? theme.titleColor : '#000000' }}; /* Default to black */
+                --theme-text-color: {{ theme ? theme.textColor : '#333333' }}; /* Default dark grey */
                 --theme-font: {{ theme ? theme.fontFamily|raw : 'system-ui' }};
                 
-                background-color: var(--theme-bg);
+                background-color: #ffffff; /* Static white background for admin preview */
                 font-family: var(--theme-font);
-                color: #333;
+                color: var(--theme-text-color);
             }
-            .article-preview h1, .article-preview h2 { color: var(--theme-primary); }
-            .preview-viz { border-top: 4px solid var(--theme-primary); }
+            .article-preview h1, .article-preview h2 { color: var(--theme-title-color); }
+            .preview-viz { border-top: 4px solid var(--theme-title-color); } /* Use titleColor for border */
             .image-small { max-height: 200px; }
             .image-medium { max-height: 400px; }
             .image-large { max-height: 600px; }
@@ -40,12 +40,12 @@
                     <div class="mb-4">
                         {% if block.type == 'text' %}
                             <div>{{ block.content|nl2br }}</div>
-                        {% elseif block.type == 'title' %}
-                            <h2 class="mt-4 border-bottom pb-2" style="border-color: var(--theme-primary) !important;">{{ block.content }}</h2>
-                        {% elseif block.type == 'viz' %}
-                            <div class="card preview-viz shadow-sm p-3">
-                                <h5 class="text-center">{{ block.vizConfig.titre|default('Graphique') }}</h5>
-                                                                  <div style="height:300px;"><canvas id="chart-{{ block.id }}" class="data-viz-canvas" data-config="{{ block.vizConfig|merge({media_id: block.media ? block.media.id : null})|json_encode|e('html_attr') }}"></canvas></div>                            </div>
+                        {% elseif block.type == constant('App\\Entity\\Block::BLOCK_TYPE_CHART') %}
+                            {% if block.media %}
+                                {{ render(controller('App\\Controller\\GraphController::embedChart', {mediaId: block.media.id})) }}
+                            {% else %}
+                                <p class="text-danger">Erreur: Le bloc graphique (CSV) ne contient pas de média associé.</p>
+                            {% endif %}
                         {% elseif block.type == 'image' and block.media %}
                             <div class="text-center my-4">
                                 <img src="{{ asset('uploads/media/' ~ block.media.filename) }}" 
@@ -64,6 +64,52 @@
         <div class="text-center mt-5">
             <a href="{{ ea_url().setAction('index') }}" class="btn btn-secondary">Retour liste</a>
             <a href="{{ ea_url().setAction('edit').setEntityId(article.id) }}" class="btn btn-primary">✏️ Modifier cet article</a>
+        </div>
+
+        {# FORMULAIRE D'AJOUT D'AVIS (ADMIN) #}
+        <div class="mt-5 p-4 bg-light rounded border shadow-sm text-start">
+            <h4 class="mb-3">➕ Ajouter un avis manuellement</h4>
+            {{ form_start(reviewForm) }}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        {{ form_row(reviewForm.pseudo) }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {{ form_row(reviewForm.rating) }}
+                    </div>
+                </div>
+                {{ form_row(reviewForm.message) }}
+                <div class="mt-3 text-end">
+                    {{ form_row(reviewForm.submit, {'label': 'Enregistrer l\'avis', 'attr': {'class': 'btn btn-success'}}) }}
+                </div>
+            {{ form_end(reviewForm) }}
+        </div>
+
+        {# LISTE DES AVIS (Admin View) #}
+        <div class="mt-5 pt-4 border-top">
+            <h3 class="mb-4">Avis des lecteurs ({{ article.ratings|length }})</h3>
+            <div class="row">
+                {% for rating in article.ratings %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <strong>{{ rating.pseudo }}</strong>
+                                    <span class="text-warning">
+                                        {% for i in 1..5 %}{% if i <= rating.rating %}★{% else %}☆{% endif %}{% endfor %}
+                                    </span>
+                                </div>
+                                <p class="card-text mt-2">{{ rating.message }}</p>
+                                <small class="text-muted">{{ rating.createdAt|date('d/m/Y H:i') }}</small>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-12">
+                        <p class="text-muted fst-italic">Aucun avis pour le moment.</p>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 

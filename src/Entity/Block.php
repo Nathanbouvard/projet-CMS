@@ -24,9 +24,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class Block
 {
     public const BLOCK_TYPE_TEXT = 'text';
-    public const BLOCK_TYPE_TITLE = 'title';
     public const BLOCK_TYPE_IMAGE = 'image';
-    public const BLOCK_TYPE_VIZ = 'viz';
+    public const BLOCK_TYPE_CHART = 'chart';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -51,7 +50,8 @@ class Block
     #[Groups(['block:read', 'block:write'])]
     private ?Article $article = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(cascade: ["remove"])]
+    #[ORM\JoinColumn(onDelete: "SET NULL")]
     #[Groups(['article:read', 'block:read', 'block:write'])]
     private ?Media $media = null;
 

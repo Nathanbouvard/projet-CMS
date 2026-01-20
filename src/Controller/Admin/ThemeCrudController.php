@@ -21,10 +21,11 @@ class ThemeCrudController extends AbstractCrudController
             TextField::new('name', 'Nom du thème')
                 ->setHelp('Ex: Dark Mode, Océan, Minimaliste...'),
 
-            ColorField::new('backgroundColor', 'Couleur de fond'),
+            ColorField::new('titleColor', 'Couleur des titres')
+                ->setHelp('Couleur pour les titres (H1, H2, etc.)'),
 
-            ColorField::new('primaryColor', 'Couleur principale')
-                ->setHelp('Sera utilisé pour les titres, les boutons et les bordures'),
+            ColorField::new('textColor', 'Couleur du texte')
+                ->setHelp('Couleur par défaut pour le texte des articles.'),
 
             ChoiceField::new('fontFamily', 'Typographie')
                 ->setChoices([

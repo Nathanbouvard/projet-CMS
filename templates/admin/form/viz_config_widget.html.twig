@@ -1,0 +1,6 @@
+{# templates/admin/form/viz_config_widget.html.twig #}
+{% extends '@EasyAdmin/crud/form/layout.html.twig' %}
+
+{% block textarea_widget %}
+    <textarea {{ block('widget_attributes') }}>{{ value }}</textarea>
+{% endblock %}

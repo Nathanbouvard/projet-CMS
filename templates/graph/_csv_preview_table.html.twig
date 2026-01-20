@@ -1,0 +1,60 @@
+<style>
+    .csv-preview-table-container {
+        width: 100%;
+        overflow-x: auto;
+        margin-top: 1em;
+        margin-bottom: 1em;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        background-color: #fff;
+    }
+    .csv-preview-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: sans-serif;
+        font-size: 0.85em;
+        white-space: nowrap;
+    }
+    .csv-preview-table th, .csv-preview-table td {
+        border: 1px solid #f0f0f0;
+        padding: 6px 10px;
+        text-align: left;
+    }
+    .csv-preview-table th {
+        background-color: #f7f7f7;
+        font-weight: bold;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+    .csv-preview-table tbody tr:nth-child(even) {
+        background-color: #fafafa;
+    }
+    .csv-preview-table tbody tr:hover {
+        background-color: #f0f8ff;
+    }
+</style>
+
+<div class="csv-preview-table-container">
+    <table class="csv-preview-table">
+        <thead>
+            <tr>
+                {% for header in headers %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+                <tr>
+                    {% for key, value in record %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if hasMore %}
+        <p style="text-align: center; margin: 10px 0; font-style: italic; color: #777;">... Affichage des {{ records|length }} premières lignes seulement ...</p>
+    {% endif %}
+</div>

@@ -57,6 +57,7 @@ class Article
     private ?User $author = null;
 
     #[ORM\ManyToOne]
+    #[ORM\JoinColumn(onDelete: "SET NULL")] // Added to set theme_id to NULL on Theme deletion
     #[Groups(['article:read', 'article:write'])]
     private ?Theme $theme = null;
 

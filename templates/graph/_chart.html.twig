@@ -1,0 +1,45 @@
+{# templates/graph/_chart.html.twig #}
+
+{# This template is designed to be embedded. It requires Chart.js to be included in the main layout. #}
+<div style="width: 100%; max-width: 600px; margin: auto; margin-bottom: 2rem;">
+    <canvas id="{{ chartId }}"></canvas>
+</div>
+
+<script>
+    console.log("Chart.js script in _chart.html.twig is executing for chartId: {{ chartId }}");
+    
+    // Assume Chart.js is already loaded by the main layout or other means
+    document.addEventListener('DOMContentLoaded', function() {
+        initChart('{{ chartId }}', {{ chartLabels|raw }}, {{ chartValues|raw }}, '{{ datasetLabel|e('js') }}');
+    });
+
+    function initChart(chartId, labels, rawValues, datasetLabel) {
+        const ctx = document.getElementById(chartId);
+        
+        // Convert rawValues (which might be strings) to numbers
+        const values = rawValues.map(value => parseFloat(value));
+
+        new Chart(ctx, {
+            type: 'bar', // or 'line', 'pie', etc.
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: datasetLabel,
+                    data: values, // Use converted values
+                    borderWidth: 1,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)'
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: true
+            }
+        });
+    }
+</script>

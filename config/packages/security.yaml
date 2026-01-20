@@ -65,8 +65,12 @@ security:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api/docs, roles: PUBLIC_ACCESS }
         - { path: ^/api/contexts, roles: PUBLIC_ACCESS }
+        - { path: ^/_embed/chart/, roles: PUBLIC_ACCESS } # Allow public access for embedded charts
+
         - { path: ^/api/schema, roles: PUBLIC_ACCESS }
         - { path: ^/api/articles, roles: PUBLIC_ACCESS }
+        - { path: ^/api/ratings, roles: PUBLIC_ACCESS }
+        - { path: ^/api/media/\d+/data, roles: PUBLIC_ACCESS }
         - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
 
         # On autorise l'accès à la page d'inscription

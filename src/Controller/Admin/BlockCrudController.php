@@ -3,14 +3,15 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Block;
-use App\Field\VizConfigField;
+// Removed: use App\Field\VizConfigField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
+// Removed: use EasyCorp\Bundle\EasyAdminBundle->Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\HiddenField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 
 class BlockCrudController extends AbstractCrudController
 {
@@ -33,21 +34,17 @@ class BlockCrudController extends AbstractCrudController
             ChoiceField::new('type')
                 ->setChoices([
                     'Texte' => 'text',
-                    'Titre' => 'title',
                     'Image' => 'image',
-                    'Visualisation (Graphique)' => 'viz',
+                    'Graphique (CSV)' => 'chart',
                 ])
                 ->renderAsNativeWidget(),
 
-            TextareaField::new('content', 'Contenu (Texte/Titre)')
-                ->setHelp('Pour les blocs Texte ou Titre uniquement'),
+            TextareaField::new('content', 'Contenu')
+                ->setHelp('Saisissez le contenu textuel ici.'),
 
-            AssociationField::new('media', 'Image')
-                ->setHelp('Pour les blocs Image uniquement')
+            AssociationField::new('media', 'Média')
+                ->setHelp('Sélectionnez un média (image ou fichier CSV).')
                 ->autocomplete(),
-
-            VizConfigField::new('vizConfig', 'Paramètres Graphique')
-                ->onlyOnForms(), 
 
             HiddenField::new('position'),
         ];

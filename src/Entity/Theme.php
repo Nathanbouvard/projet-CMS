@@ -28,13 +28,13 @@ class Theme
     #[Groups(['article:read'])]
     private ?string $name = null;
 
-    #[ORM\Column(length: 7)]
+    #[ORM\Column(length: 7, nullable: true)]
     #[Groups(['article:read'])]
-    private ?string $backgroundColor = null;
+    private ?string $titleColor = null;
 
-    #[ORM\Column(length: 7)]
+    #[ORM\Column(length: 7, nullable: true)]
     #[Groups(['article:read'])]
-    private ?string $primaryColor = null;
+    private ?string $textColor = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['article:read'])]
@@ -77,8 +77,6 @@ class Theme
         return $this;
     }
 
-
-
     public function getName(): ?string
     {
         return $this->name;
@@ -90,25 +88,25 @@ class Theme
         return $this;
     }
 
-    public function getBackgroundColor(): ?string
+    public function getTitleColor(): ?string
     {
-        return $this->backgroundColor;
+        return $this->titleColor;
     }
 
-    public function setBackgroundColor(string $backgroundColor): static
+    public function setTitleColor(?string $titleColor): static
     {
-        $this->backgroundColor = $backgroundColor;
+        $this->titleColor = $titleColor;
         return $this;
     }
 
-    public function getPrimaryColor(): ?string
+    public function getTextColor(): ?string
     {
-        return $this->primaryColor;
+        return $this->textColor;
     }
 
-    public function setPrimaryColor(string $primaryColor): static
+    public function setTextColor(?string $textColor): static
     {
-        $this->primaryColor = $primaryColor;
+        $this->textColor = $textColor;
         return $this;
     }
 

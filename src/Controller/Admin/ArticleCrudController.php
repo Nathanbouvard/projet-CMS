@@ -15,12 +15,56 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Rating;
+use App\Form\ReviewType;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
+use Symfony\Component\HttpFoundation\Response;
 
 class ArticleCrudController extends AbstractCrudController
 {
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     public static function getEntityFqcn(): string
     {
         return Article::class;
+    }
+
+    public function detail(AdminContext $context): KeyValueStore|Response
+    {
+        $article = $context->getEntity()->getInstance();
+        
+        // Création du formulaire d'avis
+        $rating = new Rating();
+        $form = $this->createForm(ReviewType::class, $rating);
+        $form->handleRequest($context->getRequest());
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $rating->setArticle($article);
+            $this->entityManager->persist($rating);
+            $this->entityManager->flush();
+
+            $this->addFlash('success', 'Avis ajouté avec succès depuis l\'administration !');
+
+            // Redirection pour éviter la soumission multiple
+            return $this->redirect($context->getReferrer() ?? $this->generateUrl('admin', [
+                'action' => 'detail',
+                'entityId' => $article->getId(),
+                'crudAction' => 'detail',
+                'controller' => self::class,
+            ]));
+        }
+
+        return $this->render('admin/article/detail.html.twig', [
+            'entity' => $context->getEntity(),
+            'article' => $article,
+            'reviewForm' => $form->createView(),
+        ]);
     }
 
     public function configureCrud(Crud $crud): Crud

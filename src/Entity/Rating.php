@@ -9,13 +9,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+
+use ApiPlatform\Metadata\Post;
 
 #[ORM\Entity(repositoryClass: RatingRepository::class)]
 #[ApiResource(
     operations: [
         new Get(),
-        new GetCollection()
-    ]
+        new GetCollection(),
+        new Post()
+    ],
+    denormalizationContext: ['groups' => ['rating:write']]
 )]
 class Rating
 {
@@ -25,21 +30,26 @@ class Rating
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['article:read', 'rating:write'])]
     private ?string $pseudo = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['article:read', 'rating:write'])]
     private ?string $message = null;
 
     #[ORM\Column]
     #[Assert\Range(min: 1, max: 5)]
+    #[Groups(['article:read', 'rating:write'])]
     private ?int $rating = null; // J'ai renommé "value" en "rating" pour être cohérent
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['article:read'])]
     private ?\DateTimeInterface $createdAt = null;
 
     // On lie la note à l'Article (et plus au Block)
     #[ORM\ManyToOne(inversedBy: 'ratings')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['rating:write'])]
     private ?Article $article = null;
 
     public function __construct()

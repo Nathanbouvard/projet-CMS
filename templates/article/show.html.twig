@@ -9,34 +9,36 @@
         :root {
             /* Couleurs dynamiques basées sur le thème */
             --theme-primary: {{ theme ? theme.primaryColor : '#0d6efd' }};
-            --theme-bg: {{ theme ? theme.backgroundColor : '#ffffff' }};
+            --theme-title-color: {{ theme ? theme.titleColor : 'var(--theme-primary)' }}; {# Default to primary if not set #}
+            --theme-text-color: {{ theme ? theme.textColor : '#333333' }}; {# Default dark grey #}
             --theme-font: {{ theme ? theme.fontFamily|raw : 'system-ui' }};
             --theme-font-size: {% if theme and theme.fontSize == 'small' %}0.8em{% elseif theme and theme.fontSize == 'large' %}1.2em{% else %}1em{% endif %};
         }
         
         body {
-            background-color: var(--theme-bg);
+            /* background-color: var(--theme-bg); Removed */
             font-family: var(--theme-font);
         }
         
         /* On force les titres et les éléments "primary" à prendre la couleur du thème */
         h1, h2, h3, h4, .text-theme {
-            color: var(--theme-primary);
+            color: var(--theme-title-color);
         }
 
-        /* Appliquer la taille de police personnalisée au contenu de l'article */
+        /* Appliquer la taille de police et la couleur personnalisée au contenu de l'article */
         .article-content {
             font-size: var(--theme-font-size);
+            color: var(--theme-text-color);
         }
 
         /* On force le bouton du formulaire PHP à prendre la couleur du thème */
         .btn-primary {
-            background-color: var(--theme-primary) !important;
-            border-color: var(--theme-primary) !important;
+            background-color: var(--theme-title-color) !important;
+            border-color: var(--theme-title-color) !important;
         }
 
         .border-theme {
-            border-color: var(--theme-primary) !important;
+            border-color: var(--theme-title-color) !important;
         }
     </style>
 
@@ -67,9 +69,6 @@
                         {% if block.type == 'text' %}
                             <div class="fs-5 lh-lg text-dark">{{ block.content|nl2br }}</div>
 
-                        {% elseif block.type == 'title' %}
-                            <h2 class="fw-bold mt-4 mb-3 border-bottom border-theme pb-2">{{ block.content }}</h2>
-
                         {% elseif block.type == 'image' and block.media %}
                             <div class="text-center my-4">
                                 <img src="{{ asset('uploads/media/' ~ block.media.filename) }}" 
@@ -77,19 +76,14 @@
                                      alt="{{ block.media.altText }}">
                             </div>
 
-                        {% elseif block.type == 'viz' %}
-                            <div class="card shadow border-theme" style="border-top-width: 5px;">
-                                <div class="card-body">
-                                    <h5 class="text-center mb-3 text-dark">{{ block.vizConfig.titre|default('Données') }}</h5>
-                                    <div style="height: 350px;">
-                                        <canvas id="chart-{{ block.id }}" class="data-viz-canvas"
-                                                data-config="{{ block.vizConfig|json_encode|e('html_attr') }}">
-                                        </canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-                    </div>
+                        {% elseif block.type == constant('App\\Entity\\Block::BLOCK_TYPE_CHART') %}
+                            {# Pass the Media ID to the GraphController #}
+                            {% if block.media %}
+                                {{ render(controller('App\\Controller\\GraphController::embedChart', {mediaId: block.media.id})) }}
+                            {% else %}
+                                <p class="text-danger">Erreur: Le bloc graphique (CSV) ne contient pas de média associé.</p>
+                            {% endif %}
+                        {% endif %}                    </div>
                 {% endfor %}
             </div>
         </div>
