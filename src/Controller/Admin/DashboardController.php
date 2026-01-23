@@ -11,12 +11,17 @@ use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class DashboardController extends AbstractDashboardController
 {
+    public function __construct(
+        private JWTTokenManagerInterface $jwtManager
+    ) {}
+
     #[IsGranted('ROLE_USER')]
     #[Route('/admin', name: 'admin')]
     public function index(): Response
@@ -58,6 +63,9 @@ class DashboardController extends AbstractDashboardController
             ->setPermission('ROLE_ADMIN');
             
         yield MenuItem::section();
-        yield MenuItem::linkToUrl('Retour au site', 'fas fa-arrow-left', 'http://localhost:3000/');
+        
+        $user = $this->getUser();
+        $token = $user ? $this->jwtManager->create($user) : '';
+        yield MenuItem::linkToUrl('Retour au site', 'fas fa-arrow-left', 'http://localhost:3000/?token=' . $token);
     }
 }
